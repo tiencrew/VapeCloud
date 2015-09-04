@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="us-ascii"?>
+
+<GameData>
+  <LevelPacks VapeName="Pen">
+  
+    <Levels LevelName="Pen1">    
+    </Levels> 
+  
+  </LevelPacks>
+
+  <LevelPacks VapeName="Pack 2">
+
+    <Levels LevelName="P1">
+    </Levels>
+
+  </LevelPacks>
+</GameData>
