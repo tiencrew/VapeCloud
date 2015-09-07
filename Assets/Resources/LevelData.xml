@@ -3,7 +3,8 @@
 <GameData>
   <LevelPacks VapeName="Pen">
   
-    <Levels LevelName="Pen1">    
+    <Levels>
+      <LevelName></LevelName>
     </Levels> 
   
   </LevelPacks>

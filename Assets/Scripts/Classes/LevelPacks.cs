@@ -3,7 +3,7 @@
 
 public class LevelPacks
 {
-    [XmlAttribute("VapeName")]
+    [XmlElement("VapeName")]
     public string vapeName;
 
     //LevelPacks Class   
