@@ -22,19 +22,30 @@
       <Tank>
         <Level>1</Level>
         <Cost>0</Cost>
-        <Time>30</Time>
+        <Time>30000</Time>
       </Tank>
       <Tank>
         <Level>1</Level>
         <Cost>100</Cost>
-        <Time>60</Time>
+        <Time>60000</Time>
       </Tank>
       
     </Vape>
     
     <Levels>
       <Name>Level 1-1</Name>
-      
+      <Multipliers>
+        <TimeValue>0</TimeValue>
+        <MultiplierValue>0</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>2000</TimeValue>
+        <MultiplierValue>0.5</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>5000</TimeValue>
+        <MultiplierValue>1.0</MultiplierValue>
+      </Multipliers>
     </Levels>   
   </LevelPacks>
  

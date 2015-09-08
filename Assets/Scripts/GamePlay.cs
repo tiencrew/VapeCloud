@@ -15,19 +15,27 @@ public class GamePlay : MonoBehaviour
 
     public Image vapeImage;
     public Text currentTime;
-    
+    public Text textMultiplier;
+    public Slider TankBar;
+
     
     private bool _pressed = false;
     private LevelPacks currLP;
     private Levels currL;
     private UserData userData;
     private UserUpgrades userUpgrade;
-
-    private static float timerDrag;
-    private static float timerCountdown;
+    
+    private static float timerDrag = 0.0f;
+    private static float timerCountdown = 0.0f;
 
     private float tankTime;
     private float coilTime;
+
+    private float currMultiplier;
+    private float baseMultiplier;
+
+    private List<Multipliers> multiTimer;
+    private int currTimer = 0;
 
 
     // Use this for initialization
@@ -42,16 +50,35 @@ public class GamePlay : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       //Countdown Timer
 
         if (!_pressed)
             return;
-        
-        //Add to Drag Timer
-        timerDrag += Time.deltaTime;
-        currentTime.text = timerDrag.ToString();
 
-        Debug.Log("Holding Down!!!!");
+        //Add to Drag Timer
+        timerDrag += Time.deltaTime * 1000f;
+        //currentTime.text = timerDrag.ToString();
+
+        //Countdown Timer
+        timerCountdown -= Time.deltaTime * 1000f;
+        currentTime.text = timerCountdown.ToString();
+        TankBar.value = timerCountdown;
+
+        //Debug.Log("Curr Timer: " + currTimer);
+        //Debug.Log("Count: " + (multiTimer.Count - 1));
+
+        //Check for Timer Multiplier
+        if (currTimer <= (multiTimer.Count - 1))
+        {            
+            if (multiTimer[currTimer].TimeValue <= timerDrag)
+            { 
+                //Set Multiplier
+                currMultiplier += multiTimer[currTimer].MultiplierValue;
+                textMultiplier.text = "x" + currMultiplier.ToString();
+
+                //Hit the timer and move to next
+                currTimer++;
+            }
+        }        
     }
 
     //Button Presses Events
@@ -67,6 +94,11 @@ public class GamePlay : MonoBehaviour
         //Stop Timer
         timerDrag = 0.0f;
 
+        //Reset Multiplers
+        currTimer = 0;
+        currMultiplier = baseMultiplier;
+        textMultiplier.text = "x" + currMultiplier.ToString();
+
     }
 
     void LoadLevel()
@@ -77,9 +109,20 @@ public class GamePlay : MonoBehaviour
         //Load User Data 
         LoadUserData();
 
-        Debug.Log(userUpgrade.tankLevel);
+        //Setup Game Parameters
+        //Tank
+        timerCountdown = currLP.vape.tanks.Find(y => y.level == userUpgrade.tankLevel).time;
+        currentTime.text = timerCountdown.ToString();
 
+        //Setup Slider for Tank 
+        TankBar.minValue = 0;
+        TankBar.maxValue = timerCountdown;
+        TankBar.value = timerCountdown;
         
+        //Setup Multipliers
+        currMultiplier = userData.baseMultiplier;
+        baseMultiplier = userData.baseMultiplier;
+
 
         //Load Sprite of Vaporizer
         Sprite vapeSprite = Resources.Load<Sprite>(currLP.vape.sprite);
@@ -101,6 +144,10 @@ public class GamePlay : MonoBehaviour
 
         currL = currLP.levels[levelID - 1];
 
+        //Setup Timed Multipliers
+        multiTimer = currL.multipliers;
+
+        Debug.Log(currL.name);
     }
 
     void LoadUserData()

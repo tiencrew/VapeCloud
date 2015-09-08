@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
 
 
 public class LevelPacks
@@ -8,7 +9,7 @@ public class LevelPacks
 
     //LevelPacks Class   
     [XmlElement("Levels")]
-    public Levels[] levels;
+    public List<Levels> levels;
     
     
 }

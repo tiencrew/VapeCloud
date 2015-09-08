@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
 public class Vape
 {
@@ -12,8 +13,8 @@ public class Vape
     public string sprite;
 
     [XmlElement("Coil")]
-    public Coil[] coils;
+    public List<Coil> coils;
 
     [XmlElement("Tank")]
-    public Tank[] tanks;
+    public List<Tank> tanks;
 }
