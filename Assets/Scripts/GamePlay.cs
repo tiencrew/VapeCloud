@@ -21,6 +21,8 @@ public class GamePlay : MonoBehaviour
     public Text textUserScore;
     public Slider TankBar;
     public Slider CoilBar;
+    public GameObject OverheatPanel;
+    public GameObject StorePanel;
 
 
     private bool _pressed = false;
@@ -28,11 +30,12 @@ public class GamePlay : MonoBehaviour
     private Levels currL;
     private UserData userData;
     private UserUpgrades userUpgrade;
-    
+
     private static float timerDrag = 0.0f;
     private static float timerCountdown = 0.0f;
 
-    
+    private bool isOverheat = false;
+
     private float maxCoilTime;
     private float currCoilTime;
 
@@ -52,12 +55,12 @@ public class GamePlay : MonoBehaviour
 
         //Load Level Parameters
         LoadLevel();
-        
+
     }
-    
+
     void Awake()
     {
-        Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
+        //Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
     }
 
     // Update is called once per frame
@@ -69,18 +72,27 @@ public class GamePlay : MonoBehaviour
         {
             //Cool Down
             if (currCoilTime < maxCoilTime)
-            { 
+            {
                 currCoilTime += timeChange * 1000f;
                 textCoils.text = currCoilTime.ToString();
                 CoilBar.value = maxCoilTime - currCoilTime;
             }
+            else if (isOverheat)
+            {
+                //Finished Overheating
+                isOverheat = false;
+
+                OverheatPanel.SetActive(false);
+            }
+
+
 
             return;
         }
 
         //Countdown Timer
         timerCountdown -= timeChange * 1000f;
-                
+
         //Check for end of tank
         if (timerCountdown <= 0)
         {
@@ -94,8 +106,11 @@ public class GamePlay : MonoBehaviour
             textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
             currCloudScore = 0;
 
+            //Bring Up Store Panel
+            OpenStorePanel();
+
             return;
-            
+
         }
 
         currentTime.text = timerCountdown.ToString();
@@ -119,14 +134,18 @@ public class GamePlay : MonoBehaviour
             currCloudScore = 0;
             textCloudPoints.text = "+0";
 
+            //Start Overheat Process
+            isOverheat = true;
+            OverheatPanel.SetActive(true);
+
 
         }
-       
+
         //Check for Timer Multiplier
         if (currTimer <= (multiTimer.Count - 1))
-        {            
+        {
             if (multiTimer[currTimer].TimeValue <= timerDrag)
-            { 
+            {
                 //Set Multiplier
                 currMultiplier += multiTimer[currTimer].MultiplierValue;
                 textMultiplier.text = "x" + currMultiplier.ToString();
@@ -166,8 +185,8 @@ public class GamePlay : MonoBehaviour
         textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
         currCloudScore = 0;
 
-        
-        
+
+
     }
 
     void LoadLevel()
@@ -187,7 +206,7 @@ public class GamePlay : MonoBehaviour
         TankBar.minValue = 0;
         TankBar.maxValue = timerCountdown;
         TankBar.value = timerCountdown;
-               
+
         //Setup Multipliers
         currMultiplier = userData.baseMultiplier;
         baseMultiplier = userData.baseMultiplier;
@@ -209,11 +228,11 @@ public class GamePlay : MonoBehaviour
 
         //Load Sprite of Vaporizer
         Sprite vapeSprite = Resources.Load<Sprite>(currLP.vape.sprite);
-        
+
         vapeImage.sprite = vapeSprite;
         vapeImage.rectTransform.sizeDelta = new Vector2(vapeSprite.rect.width, vapeSprite.rect.height);
-            
-        
+
+
     }
 
     void LoadGameData(int packID, int levelID)
@@ -229,7 +248,7 @@ public class GamePlay : MonoBehaviour
 
         //Setup Timed Multipliers
         multiTimer = currL.multipliers;
-              
+
 
         Debug.Log(currL.name);
     }
@@ -244,7 +263,7 @@ public class GamePlay : MonoBehaviour
             FileStream file = File.Open(Application.persistentDataPath + "/savedGame.gd", FileMode.Open);
             userData = (UserData)bf.Deserialize(file);
             file.Close();
-                        
+
         }
         else
         {
@@ -280,7 +299,7 @@ public class GamePlay : MonoBehaviour
         //Application.persistentDataPath is a string, so if you wanted you can put that into debug.log if you want to know where save games are located
         if (File.Exists(Application.persistentDataPath + "/savedGame.gd"))
         {
-            file = File.Open(Application.persistentDataPath + "/savedGame.gd", FileMode.Open); 
+            file = File.Open(Application.persistentDataPath + "/savedGame.gd", FileMode.Open);
         }
         else
         {
@@ -290,6 +309,41 @@ public class GamePlay : MonoBehaviour
         file.Close();
     }
 
+    //Store Functions
+
+    public void OpenStorePanel()
+    {
+        //Load upgrades and points
+
+        //Open Panel
+        StorePanel.SetActive(true);
+    }
+
+    public void CloseStorePanel()
+    {
+        StorePanel.SetActive(false);
+    }
+
+    public void RefillTank()
+    {
+        //Reloads all level and tank
+        SaveUserData();
+
+        //Setup Tank
+        timerCountdown = currLP.vape.tanks.Find(y => y.level == userUpgrade.tankLevel).time;
+        currentTime.text = timerCountdown.ToString();
+
+        //Setup Slider for Tank 
+        TankBar.minValue = 0;
+        TankBar.maxValue = timerCountdown;
+        TankBar.value = timerCountdown;
+
+        CloseStorePanel();
+    }
+
+
+
+    //Close and Save Application
 
     void OnApplicationPause()
     {

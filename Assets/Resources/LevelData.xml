@@ -22,7 +22,7 @@
       <Tank>
         <Level>1</Level>
         <Cost>0</Cost>
-        <Time>10000</Time>
+        <Time>1000</Time>
       </Tank>
       <Tank>
         <Level>2</Level>
