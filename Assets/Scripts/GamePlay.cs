@@ -16,9 +16,13 @@ public class GamePlay : MonoBehaviour
     public Image vapeImage;
     public Text currentTime;
     public Text textMultiplier;
+    public Text textCoils;
+    public Text textCloudPoints;
+    public Text textUserScore;
     public Slider TankBar;
+    public Slider CoilBar;
 
-    
+
     private bool _pressed = false;
     private LevelPacks currLP;
     private Levels currL;
@@ -28,11 +32,15 @@ public class GamePlay : MonoBehaviour
     private static float timerDrag = 0.0f;
     private static float timerCountdown = 0.0f;
 
-    private float tankTime;
-    private float coilTime;
+    
+    private float maxCoilTime;
+    private float currCoilTime;
 
     private float currMultiplier;
     private float baseMultiplier;
+
+    private float pointValue;
+    private float currCloudScore;
 
     private List<Multipliers> multiTimer;
     private int currTimer = 0;
@@ -46,26 +54,74 @@ public class GamePlay : MonoBehaviour
         LoadLevel();
         
     }
+    
+    void Awake()
+    {
+        Environment.SetEnvironmentVariable("MONO_REFLECTION_SERIALIZER", "yes");
+    }
 
     // Update is called once per frame
     void Update()
     {
+        float timeChange = Time.deltaTime;
 
         if (!_pressed)
-            return;
+        {
+            //Cool Down
+            if (currCoilTime < maxCoilTime)
+            { 
+                currCoilTime += timeChange * 1000f;
+                textCoils.text = currCoilTime.ToString();
+                CoilBar.value = maxCoilTime - currCoilTime;
+            }
 
-        //Add to Drag Timer
-        timerDrag += Time.deltaTime * 1000f;
-        //currentTime.text = timerDrag.ToString();
+            return;
+        }
 
         //Countdown Timer
-        timerCountdown -= Time.deltaTime * 1000f;
+        timerCountdown -= timeChange * 1000f;
+                
+        //Check for end of tank
+        if (timerCountdown <= 0)
+        {
+            //End Tank and Bring up modal
+            currentTime.text = "0";
+            TankBar.value = 0;
+            _pressed = false;
+
+            //Save Score            
+            userData.currentMoney += Mathf.Round(currCloudScore);
+            textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+            currCloudScore = 0;
+
+            return;
+            
+        }
+
         currentTime.text = timerCountdown.ToString();
         TankBar.value = timerCountdown;
 
-        //Debug.Log("Curr Timer: " + currTimer);
-        //Debug.Log("Count: " + (multiTimer.Count - 1));
+        //Add to Drag Timer
+        timerDrag += timeChange * 1000f;
+        //currentTime.text = timerDrag.ToString();
 
+        //Check for Coil 
+        currCoilTime -= timeChange * 1000f;
+        textCoils.text = currCoilTime.ToString();
+        CoilBar.value = maxCoilTime - currCoilTime;
+
+        if (currCoilTime <= 0)
+        {
+            //Overheat
+            _pressed = false;
+
+            //Reset Score - Do Not Save Score - User Failed
+            currCloudScore = 0;
+            textCloudPoints.text = "+0";
+
+
+        }
+       
         //Check for Timer Multiplier
         if (currTimer <= (multiTimer.Count - 1))
         {            
@@ -78,7 +134,13 @@ public class GamePlay : MonoBehaviour
                 //Hit the timer and move to next
                 currTimer++;
             }
-        }        
+        }
+
+        //Add Score
+        currCloudScore += (pointValue * timeChange) * currMultiplier;
+
+        //Show Score
+        textCloudPoints.text = "+" + Mathf.RoundToInt(currCloudScore);
     }
 
     //Button Presses Events
@@ -99,6 +161,13 @@ public class GamePlay : MonoBehaviour
         currMultiplier = baseMultiplier;
         textMultiplier.text = "x" + currMultiplier.ToString();
 
+        //Save Score to Total
+        userData.currentMoney += Mathf.Round(currCloudScore);
+        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+        currCloudScore = 0;
+
+        
+        
     }
 
     void LoadLevel()
@@ -118,11 +187,25 @@ public class GamePlay : MonoBehaviour
         TankBar.minValue = 0;
         TankBar.maxValue = timerCountdown;
         TankBar.value = timerCountdown;
-        
+               
         //Setup Multipliers
         currMultiplier = userData.baseMultiplier;
         baseMultiplier = userData.baseMultiplier;
 
+        //Setup Coils
+        maxCoilTime = currLP.vape.coils.Find(y => y.level == userUpgrade.coilLevel).Overheat;
+        currCoilTime = maxCoilTime;
+
+        //Setup Slider for Coil
+        CoilBar.minValue = 0;
+        CoilBar.maxValue = maxCoilTime;
+        CoilBar.value = 0;
+
+        //Setup Point Values (millisecond * pointvalue) = per second scoring
+        pointValue = currL.pointValue;
+
+        //Show Current User Score
+        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
 
         //Load Sprite of Vaporizer
         Sprite vapeSprite = Resources.Load<Sprite>(currLP.vape.sprite);
@@ -146,6 +229,7 @@ public class GamePlay : MonoBehaviour
 
         //Setup Timed Multipliers
         multiTimer = currL.multipliers;
+              
 
         Debug.Log(currL.name);
     }
@@ -154,10 +238,10 @@ public class GamePlay : MonoBehaviour
     {
         userData = new UserData();
 
-        if (File.Exists(Application.persistentDataPath + "/savedGames.gd"))
+        if (File.Exists(Application.persistentDataPath + "/savedGame.gd"))
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open(Application.persistentDataPath + "/savedGames.gd", FileMode.Open);
+            FileStream file = File.Open(Application.persistentDataPath + "/savedGame.gd", FileMode.Open);
             userData = (UserData)bf.Deserialize(file);
             file.Close();
                         
@@ -192,15 +276,35 @@ public class GamePlay : MonoBehaviour
     void SaveUserData()
     {
         BinaryFormatter bf = new BinaryFormatter();
+        FileStream file;
         //Application.persistentDataPath is a string, so if you wanted you can put that into debug.log if you want to know where save games are located
-        FileStream file = File.Create(Application.persistentDataPath + "/savedGames.gd"); //you can call it anything you want
+        if (File.Exists(Application.persistentDataPath + "/savedGame.gd"))
+        {
+            file = File.Open(Application.persistentDataPath + "/savedGame.gd", FileMode.Open); 
+        }
+        else
+        {
+            file = File.Create(Application.persistentDataPath + "/savedGame.gd"); //you can call it anything you want
+        }
         bf.Serialize(file, userData);
         file.Close();
     }
 
 
-    //Count Down Timer
+    void OnApplicationPause()
+    {
+        #if UNITY_EDITOR
+            Debug.Log("EDITOR");
+        #elif UNITY_ANDROID
+            SaveUserData();
+        #endif
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveUserData();
+    }
 
 
-   
+
 }

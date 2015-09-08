@@ -11,29 +11,30 @@
       <Coil>
         <Level>1</Level>
         <Cost>0</Cost>
-        <Overheat>10</Overheat>
+        <Overheat>5000</Overheat>
       </Coil>
       <Coil>
         <Level>2</Level>
         <Cost>100</Cost>
-        <Overheat>20</Overheat>
+        <Overheat>10000</Overheat>
       </Coil>
 
       <Tank>
         <Level>1</Level>
         <Cost>0</Cost>
-        <Time>30000</Time>
+        <Time>10000</Time>
       </Tank>
       <Tank>
-        <Level>1</Level>
+        <Level>2</Level>
         <Cost>100</Cost>
-        <Time>60000</Time>
+        <Time>20000</Time>
       </Tank>
       
     </Vape>
     
     <Levels>
       <Name>Level 1-1</Name>
+      <PointValue>5</PointValue>
       <Multipliers>
         <TimeValue>0</TimeValue>
         <MultiplierValue>0</MultiplierValue>
@@ -54,10 +55,45 @@
     <Vape>
       <Name>FatVape</Name>
       <Sprite>Sprites/Vapes/vape_2</Sprite>
+
+      <Coil>
+        <Level>1</Level>
+        <Cost>0</Cost>
+        <Overheat>5000</Overheat>
+      </Coil>
+      <Coil>
+        <Level>2</Level>
+        <Cost>500</Cost>
+        <Overheat>15000</Overheat>
+      </Coil>
+
+      <Tank>
+        <Level>1</Level>
+        <Cost>0</Cost>
+        <Time>20000</Time>
+      </Tank>
+      <Tank>
+        <Level>2</Level>
+        <Cost>500</Cost>
+        <Time>30000</Time>
+      </Tank>
     </Vape>
 
     <Levels>
       <Name>Level 2-1</Name>
+      <PointValue>.01</PointValue>
+      <Multipliers>
+        <TimeValue>0</TimeValue>
+        <MultiplierValue>0</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>2000</TimeValue>
+        <MultiplierValue>0.5</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>5000</TimeValue>
+        <MultiplierValue>1.0</MultiplierValue>
+      </Multipliers>
     </Levels>
   </LevelPacks>
 </GameData>
