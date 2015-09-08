@@ -1,18 +1,52 @@
 <?xml version="1.0" encoding="us-ascii"?>
 
 <GameData>
-  <LevelPacks VapeName="Pen">
   
+  <LevelPacks>
+    <ID>1</ID>
+    <Vape>
+      <Name>Pen</Name>
+      <Sprite>Sprites/Vapes/vape_1</Sprite>
+
+      <Coil>
+        <Level>1</Level>
+        <Cost>0</Cost>
+        <Overheat>10</Overheat>
+      </Coil>
+      <Coil>
+        <Level>2</Level>
+        <Cost>100</Cost>
+        <Overheat>20</Overheat>
+      </Coil>
+
+      <Tank>
+        <Level>1</Level>
+        <Cost>0</Cost>
+        <Time>30</Time>
+      </Tank>
+      <Tank>
+        <Level>1</Level>
+        <Cost>100</Cost>
+        <Time>60</Time>
+      </Tank>
+      
+    </Vape>
+    
     <Levels>
-      <LevelName></LevelName>
-    </Levels> 
-  
+      <Name>Level 1-1</Name>
+      
+    </Levels>   
   </LevelPacks>
+ 
+  <LevelPacks>
+    <ID>2</ID>
+    <Vape>
+      <Name>FatVape</Name>
+      <Sprite>Sprites/Vapes/vape_2</Sprite>
+    </Vape>
 
-  <LevelPacks VapeName="Pack 2">
-
-    <Levels LevelName="P1">
+    <Levels>
+      <Name>Level 2-1</Name>
     </Levels>
-
   </LevelPacks>
 </GameData>

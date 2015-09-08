@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 
 public class Levels {
 
-    [XmlAttribute("LevelName")]
-    public string levelName;
+    [XmlElement("Name")]
+    public string name;
 
 }

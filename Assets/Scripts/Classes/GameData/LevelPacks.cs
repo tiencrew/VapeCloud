@@ -3,8 +3,8 @@
 
 public class LevelPacks
 {
-    [XmlElement("VapeName")]
-    public string vapeName;
+    [XmlElement("Vape")]
+    public Vape vape;
 
     //LevelPacks Class   
     [XmlElement("Levels")]
