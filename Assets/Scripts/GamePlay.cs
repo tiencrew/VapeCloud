@@ -19,11 +19,13 @@ public class GamePlay : MonoBehaviour
     public Text textCoils;
     public Text textCloudPoints;
     public Text textUserScore;
+    public Text textStoreScore;
     public Slider TankBar;
     public Slider CoilBar;
     public GameObject OverheatPanel;
     public GameObject StorePanel;
 
+    public Image[] tankUpgrades;
 
     private bool _pressed = false;
     private LevelPacks currLP;
@@ -181,6 +183,7 @@ public class GamePlay : MonoBehaviour
         //Save Score to Total
         userData.currentMoney += Mathf.Round(currCloudScore);
         textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+        
         currCloudScore = 0;
 
 
@@ -311,7 +314,14 @@ public class GamePlay : MonoBehaviour
 
     public void OpenStorePanel()
     {
-        //Load upgrades and points
+        //Load Points
+        textStoreScore.text = Mathf.Round(userData.currentMoney).ToString();
+
+        //Load Upgrades
+        for (int i = 1; i <= userUpgrade.tankLevel; i++)
+        {
+            tankUpgrades[i - 1].gameObject.SetActive(true);
+        }
 
         //Open Panel
         StorePanel.SetActive(true);
@@ -326,7 +336,7 @@ public class GamePlay : MonoBehaviour
     {
         //Reloads all level and tank
         SaveUserData();
-
+        
         //Setup Tank
         timerCountdown = currLP.vape.tanks.Find(y => y.level == userUpgrade.tankLevel).time;
         currentTime.text = timerCountdown.ToString();
