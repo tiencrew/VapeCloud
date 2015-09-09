@@ -84,9 +84,7 @@ public class GamePlay : MonoBehaviour
 
                 OverheatPanel.SetActive(false);
             }
-
-
-
+            
             return;
         }
 
