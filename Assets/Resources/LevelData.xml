@@ -22,12 +22,27 @@
       <Tank>
         <Level>1</Level>
         <Cost>0</Cost>
-        <Time>1000</Time>
+        <Time>10000</Time>
       </Tank>
       <Tank>
         <Level>2</Level>
         <Cost>100</Cost>
         <Time>20000</Time>
+      </Tank>
+      <Tank>
+        <Level>3</Level>
+        <Cost>200</Cost>
+        <Time>30000</Time>
+      </Tank>
+      <Tank>
+        <Level>4</Level>
+        <Cost>400</Cost>
+        <Time>40000</Time>
+      </Tank>
+      <Tank>
+        <Level>5</Level>
+        <Cost>1000</Cost>
+        <Time>50000</Time>
       </Tank>
       
     </Vape>
@@ -35,6 +50,7 @@
     <Levels>
       <Name>Level 1-1</Name>
       <PointValue>5</PointValue>
+      <PointsToNextLevel>1000</PointsToNextLevel>
       <Multipliers>
         <TimeValue>0</TimeValue>
         <MultiplierValue>0</MultiplierValue>
@@ -47,7 +63,24 @@
         <TimeValue>5000</TimeValue>
         <MultiplierValue>1.0</MultiplierValue>
       </Multipliers>
-    </Levels>   
+    </Levels>
+    <Levels>
+      <Name>Level 1-2</Name>
+      <PointValue>10</PointValue>
+      <PointsToNextLevel>2000</PointsToNextLevel>
+      <Multipliers>
+        <TimeValue>0</TimeValue>
+        <MultiplierValue>0</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>1500</TimeValue>
+        <MultiplierValue>0.75</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>4000</TimeValue>
+        <MultiplierValue>1.25</MultiplierValue>
+      </Multipliers>
+    </Levels>
   </LevelPacks>
  
   <LevelPacks>
@@ -82,6 +115,7 @@
     <Levels>
       <Name>Level 2-1</Name>
       <PointValue>.01</PointValue>
+      <PointsToNextLevel>5000</PointsToNextLevel>
       <Multipliers>
         <TimeValue>0</TimeValue>
         <MultiplierValue>0</MultiplierValue>

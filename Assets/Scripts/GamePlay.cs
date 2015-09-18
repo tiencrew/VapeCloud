@@ -20,10 +20,14 @@ public class GamePlay : MonoBehaviour
     public Text textCloudPoints;
     public Text textUserScore;
     public Text textStoreScore;
+    public Text textTankCost;
     public Slider TankBar;
     public Slider CoilBar;
+    public Slider LevelBar;
     public GameObject OverheatPanel;
     public GameObject StorePanel;
+
+    public Button buttonBuyTanks;
 
     public Image[] tankUpgrades;
 
@@ -221,6 +225,12 @@ public class GamePlay : MonoBehaviour
         CoilBar.maxValue = maxCoilTime;
         CoilBar.value = 0;
 
+        //Setup Level Bar
+        //Setup Slider for Coil
+        LevelBar.minValue = 0;
+        LevelBar.maxValue = currL.pointsToNextLevel;
+        LevelBar.value = userData.currentMoney;
+
         //Setup Point Values (millisecond * pointvalue) = per second scoring
         pointValue = currL.pointValue;
 
@@ -234,6 +244,15 @@ public class GamePlay : MonoBehaviour
         vapeImage.rectTransform.sizeDelta = new Vector2(vapeSprite.rect.width, vapeSprite.rect.height);
 
 
+    }
+
+    private void UpdateScore()
+    {
+        //Show Current User Score
+        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+
+        //Show Updated Store Score
+        textStoreScore.text = Mathf.Round(userData.currentMoney).ToString();
     }
 
     void LoadGameData(int packID, int levelID)
@@ -316,15 +335,64 @@ public class GamePlay : MonoBehaviour
     {
         //Load Points
         textStoreScore.text = Mathf.Round(userData.currentMoney).ToString();
+        LevelBar.value = userData.currentMoney;
 
+        LoadUpgrades();
+
+        //Open Panel
+        StorePanel.SetActive(true);
+    }
+
+    private void LoadUpgrades()
+    {
         //Load Upgrades
         for (int i = 1; i <= userUpgrade.tankLevel; i++)
         {
             tankUpgrades[i - 1].gameObject.SetActive(true);
         }
 
-        //Open Panel
-        StorePanel.SetActive(true);
+        //Costs
+        if (userUpgrade.tankLevel < currLP.vape.tanks.Count)
+        {
+            buttonBuyTanks.gameObject.SetActive(true);
+            //Subtract 1 because of Array
+            textTankCost.text = "$" + currLP.vape.tanks[userUpgrade.tankLevel].cost;
+        }
+        else
+        {
+            //Hide Button
+            buttonBuyTanks.gameObject.SetActive(false);
+        }
+
+        if (userData.currentMoney < currLP.vape.tanks[userUpgrade.tankLevel].cost)
+        {
+            //Cannot affort, change color
+            buttonBuyTanks.image.color = Color.red;
+        }
+        else
+        {
+            //Can afford, turn normal color
+            buttonBuyTanks.image.color = Color.white;
+        }
+    }
+
+    public void BuyTank()
+    {
+        if (userData.currentMoney >= currLP.vape.tanks[userUpgrade.tankLevel].cost)
+        { 
+            //Purchase
+            userData.currentMoney -= currLP.vape.tanks[userUpgrade.tankLevel].cost;
+            userUpgrade.tankLevel += 1;
+
+            //Update Score         
+            UpdateScore();
+
+            LoadUpgrades();
+
+            //Update Tank            
+            TankBar.maxValue = currLP.vape.tanks.Find(y => y.level == userUpgrade.tankLevel).time;
+
+        }
     }
 
     public void CloseStorePanel()

@@ -14,4 +14,8 @@ public class Levels {
     [XmlElement("Multipliers")]
     public List<Multipliers> multipliers;
 
+    [XmlElement("PointsToNextLevel")]
+    public float pointsToNextLevel;
+      
+
 }
