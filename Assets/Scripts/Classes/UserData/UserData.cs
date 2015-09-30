@@ -11,6 +11,8 @@ public class UserData
     public DateTime startPlay;
     public DateTime lastPlay;
 
+    public int level;
+
     public float baseMultiplier;
 
     public List<UserUpgrades> userUpgrades;

@@ -26,6 +26,9 @@ public class GamePlay : MonoBehaviour
     public Slider LevelBar;
     public GameObject OverheatPanel;
     public GameObject StorePanel;
+    
+    public GameObject SmokeController;
+    public GameObject BlueSwirlController;
 
     public Button buttonBuyTanks;
 
@@ -54,6 +57,9 @@ public class GamePlay : MonoBehaviour
     private List<Multipliers> multiTimer;
     private int currTimer = 0;
 
+    private Animator smokeAnimator;
+    private Animator blueSwirlAnimator;
+
 
     // Use this for initialization
     void Start()
@@ -79,7 +85,7 @@ public class GamePlay : MonoBehaviour
             //Cool Down
             if (currCoilTime < maxCoilTime)
             {
-                currCoilTime += timeChange * 1000f;
+                currCoilTime += timeChange * 3000f;
                 textCoils.text = currCoilTime.ToString();
                 CoilBar.value = maxCoilTime - currCoilTime;
             }
@@ -107,7 +113,7 @@ public class GamePlay : MonoBehaviour
 
             //Save Score            
             userData.currentMoney += Mathf.Round(currCloudScore);
-            textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+            UpdateScore();
             currCloudScore = 0;
 
             //Bring Up Store Panel
@@ -150,6 +156,10 @@ public class GamePlay : MonoBehaviour
         {
             if (multiTimer[currTimer].TimeValue <= timerDrag)
             {
+                if (currTimer > 0 && !isOverheat)
+                {
+                    blueSwirlAnimator.SetTrigger("SetoffSwirl");
+                }                
                 //Set Multiplier
                 currMultiplier += multiTimer[currTimer].MultiplierValue;
                 textMultiplier.text = "x" + currMultiplier.ToString();
@@ -170,11 +180,13 @@ public class GamePlay : MonoBehaviour
     public void ButtonDown()
     {
         _pressed = true;
+        smokeAnimator.SetBool("SmokeOn", true);
     }
 
     public void ButtonUp()
     {
         _pressed = false;
+        smokeAnimator.SetBool("SmokeOn", false);
 
         //Stop Timer
         timerDrag = 0.0f;
@@ -186,7 +198,7 @@ public class GamePlay : MonoBehaviour
 
         //Save Score to Total
         userData.currentMoney += Mathf.Round(currCloudScore);
-        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+        UpdateScore();
         
         currCloudScore = 0;
 
@@ -235,7 +247,7 @@ public class GamePlay : MonoBehaviour
         pointValue = currL.pointValue;
 
         //Show Current User Score
-        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+        UpdateScore();
 
         //Load Sprite of Vaporizer
         Sprite vapeSprite = Resources.Load<Sprite>(currLP.vape.sprite);
@@ -243,13 +255,18 @@ public class GamePlay : MonoBehaviour
         vapeImage.sprite = vapeSprite;
         vapeImage.rectTransform.sizeDelta = new Vector2(vapeSprite.rect.width, vapeSprite.rect.height);
 
+        //Setup Smoke
+        smokeAnimator = SmokeController.GetComponent<Animator>() as Animator;
+
+        //Setup BlueSwirl
+        blueSwirlAnimator = BlueSwirlController.GetComponent<Animator>() as Animator;
 
     }
 
     private void UpdateScore()
     {
         //Show Current User Score
-        textUserScore.text = "Score: " + Mathf.Round(userData.currentMoney);
+        textUserScore.text = Mathf.Round(userData.currentMoney).ToString();
 
         //Show Updated Store Score
         textStoreScore.text = Mathf.Round(userData.currentMoney).ToString();
@@ -289,23 +306,7 @@ public class GamePlay : MonoBehaviour
         {
             //Create new save
             //Add
-            userData.currentMoney = 0;
-            userData.baseMultiplier = 1;
-            userData.lastPlay = DateTime.Now;
-            userData.startPlay = DateTime.Now;
-
-            userData.userUpgrades = new List<UserUpgrades>();
-
-            UserUpgrades upgrade = new UserUpgrades();
-            upgrade.levelPack = 1;
-            upgrade.level = 1;
-            upgrade.tankLevel = 1;
-            upgrade.coilLevel = 1;
-            upgrade.cottonLevel = 1;
-
-            userData.userUpgrades.Add(upgrade);
-
-            SaveUserData();
+            NewUser();
         }
 
         //Get Current Upgrade Level
@@ -415,6 +416,34 @@ public class GamePlay : MonoBehaviour
         TankBar.value = timerCountdown;
 
         CloseStorePanel();
+    }
+
+
+    public void NewUser()
+    {
+        //Sets Up New User
+
+        userData.currentMoney = 0;
+        userData.baseMultiplier = 1;
+        userData.lastPlay = DateTime.Now;
+        userData.startPlay = DateTime.Now;
+        userData.level = 1;
+
+        userData.userUpgrades = new List<UserUpgrades>();
+
+        UserUpgrades upgrade = new UserUpgrades();
+        upgrade.levelPack = 1;
+        upgrade.level = 1;
+        upgrade.tankLevel = 1;
+        upgrade.coilLevel = 1;
+        upgrade.cottonLevel = 1;
+
+        userData.userUpgrades.Add(upgrade);
+
+        SaveUserData();
+
+        UpdateScore();
+
     }
 
 
