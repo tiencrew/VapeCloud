@@ -6,8 +6,7 @@ using System;
 public class UserUpgrades
 {
     //ID Values
-    public int levelPack;
-    public int level;
+    public int vapeID;
 
     public int coilLevel;
     public int tankLevel;

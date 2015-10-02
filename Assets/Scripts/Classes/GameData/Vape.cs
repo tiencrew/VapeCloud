@@ -15,6 +15,11 @@ public class Vape
     [XmlElement("Coil")]
     public List<Coil> coils;
 
+    [XmlElement("Cotton")]
+    public List<Cotton> cottons;
+
     [XmlElement("Tank")]
     public List<Tank> tanks;
+
+   
 }

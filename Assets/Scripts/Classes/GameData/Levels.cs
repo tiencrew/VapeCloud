@@ -8,6 +8,9 @@ public class Levels {
     [XmlElement("Name")]
     public string name;
 
+    [XmlElement("ID")]
+    public int id;
+
     [XmlElement("PointValue")]
     public float pointValue;
 

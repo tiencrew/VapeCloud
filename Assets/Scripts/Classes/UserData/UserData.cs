@@ -12,23 +12,23 @@ public class UserData
     public DateTime lastPlay;
 
     public int level;
+    public int levelPack;
 
     public float baseMultiplier;
 
     public List<UserUpgrades> userUpgrades;
 
-    public UserUpgrades GetUpgrade(int LevelPack, int Level)
+    public UserUpgrades GetUpgrade(int VapeID)
     {
         UserUpgrades holdVal;
 
-        holdVal = this.userUpgrades.Find(y => y.levelPack == LevelPack && y.level == Level);
+        holdVal = this.userUpgrades.Find(y => y.vapeID == VapeID);
 
         if (holdVal == null)
         {
             // Not found, so return base level stats.
             holdVal = new UserUpgrades();
-            holdVal.levelPack = LevelPack;
-            holdVal.level = Level;
+            holdVal.vapeID = 1;
             holdVal.tankLevel = 1;
             holdVal.coilLevel = 1;
             holdVal.cottonLevel = 1;
@@ -37,5 +37,8 @@ public class UserData
         return holdVal;
     }
 
-	
+    //TODO: Add Vape list
+    public List<Vape> UserVapes;
+    public int selectedVape;
+
 }

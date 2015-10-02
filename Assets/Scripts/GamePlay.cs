@@ -13,7 +13,9 @@ public class GamePlay : MonoBehaviour
     public int currPack = 1;
     public int currLevel = 1;
 
-    public Image vapeImage;
+    public Image imageVape;
+    public Image imageCurrentLevel;
+
     public Text currentTime;
     public Text textMultiplier;
     public Text textCoils;
@@ -21,6 +23,11 @@ public class GamePlay : MonoBehaviour
     public Text textUserScore;
     public Text textStoreScore;
     public Text textTankCost;
+    public Text textCoilCost;
+    public Text textCottonCost;
+    public Text textCurrentLevel;
+    public Text textPointsToNextLevel;
+    
     public Slider TankBar;
     public Slider CoilBar;
     public Slider LevelBar;
@@ -31,8 +38,13 @@ public class GamePlay : MonoBehaviour
     public GameObject BlueSwirlController;
 
     public Button buttonBuyTanks;
-
     public Image[] tankUpgrades;
+
+    public Button buttonBuyCoils;
+    public Image[] coilUpgrades;
+
+    public Button buttonBuyCottons;
+    public Image[] cottonUpgrades;
 
     private bool _pressed = false;
     private LevelPacks currLP;
@@ -47,6 +59,8 @@ public class GamePlay : MonoBehaviour
 
     private float maxCoilTime;
     private float currCoilTime;
+
+    private float cooldownAmount;
 
     private float currMultiplier;
     private float baseMultiplier;
@@ -85,7 +99,8 @@ public class GamePlay : MonoBehaviour
             //Cool Down
             if (currCoilTime < maxCoilTime)
             {
-                currCoilTime += timeChange * 3000f;
+                //Update with Cotton Timer
+                currCoilTime += timeChange * cooldownAmount;
                 textCoils.text = currCoilTime.ToString();
                 CoilBar.value = maxCoilTime - currCoilTime;
             }
@@ -143,6 +158,9 @@ public class GamePlay : MonoBehaviour
             //Reset Score - Do Not Save Score - User Failed
             currCloudScore = 0;
             textCloudPoints.text = "+0";
+
+            //Reset Muliplier
+            textMultiplier.text = "x" + baseMultiplier.ToString();
 
             //Start Overheat Process
             isOverheat = true;
@@ -208,11 +226,12 @@ public class GamePlay : MonoBehaviour
 
     void LoadLevel()
     {
-        //Load Game Data from XML 
-        LoadGameData(currPack, currLevel);
 
         //Load User Data 
         LoadUserData();
+
+        //Load Game Data from XML 
+        LoadGameData(currPack, currLevel);
 
         //Setup Game Parameters
         //Tank
@@ -231,6 +250,9 @@ public class GamePlay : MonoBehaviour
         //Setup Coils
         maxCoilTime = currLP.vape.coils.Find(y => y.level == userUpgrade.coilLevel).Overheat;
         currCoilTime = maxCoilTime;
+
+        //Setup Cooldown Timer
+        cooldownAmount = currLP.vape.cottons.Find(y => y.level == userUpgrade.cottonLevel).Overheat;
 
         //Setup Slider for Coil
         CoilBar.minValue = 0;
@@ -252,8 +274,8 @@ public class GamePlay : MonoBehaviour
         //Load Sprite of Vaporizer
         Sprite vapeSprite = Resources.Load<Sprite>(currLP.vape.sprite);
 
-        vapeImage.sprite = vapeSprite;
-        vapeImage.rectTransform.sizeDelta = new Vector2(vapeSprite.rect.width, vapeSprite.rect.height);
+        imageVape.sprite = vapeSprite;
+        imageVape.rectTransform.sizeDelta = new Vector2(vapeSprite.rect.width, vapeSprite.rect.height);
 
         //Setup Smoke
         smokeAnimator = SmokeController.GetComponent<Animator>() as Animator;
@@ -270,6 +292,38 @@ public class GamePlay : MonoBehaviour
 
         //Show Updated Store Score
         textStoreScore.text = Mathf.Round(userData.currentMoney).ToString();
+
+        //Update Level Stats
+        textCurrentLevel.text = userData.level.ToString();
+
+        //Update next Level         
+        float nextLevelPoints = currL.pointsToNextLevel;
+
+        //Check for Next Level
+        if (nextLevelPoints - 1 <= userData.currentMoney)
+        {
+            //Next Level
+            NextLevel();
+        }
+
+        imageCurrentLevel.fillAmount = userData.currentMoney / nextLevelPoints;
+
+        textPointsToNextLevel.text = (nextLevelPoints - userData.currentMoney).ToString();
+
+        
+
+    }
+
+    private void NextLevel()
+    {
+        userData.level += 1;
+        currLevel += 1;
+
+        currL = currLP.levels[currLevel - 1];
+
+        //Setup Timed Multipliers
+        multiTimer = currL.multipliers;
+
     }
 
     void LoadGameData(int packID, int levelID)
@@ -309,8 +363,11 @@ public class GamePlay : MonoBehaviour
             NewUser();
         }
 
+        currPack = userData.levelPack;
+        currLevel = userData.level;
+
         //Get Current Upgrade Level
-        userUpgrade = userData.GetUpgrade(currPack, currLevel);
+        userUpgrade = userData.GetUpgrade(userData.selectedVape);
     }
 
     void SaveUserData()
@@ -347,11 +404,11 @@ public class GamePlay : MonoBehaviour
     private void LoadUpgrades()
     {
         //Load Upgrades
+        //Tank
         for (int i = 1; i <= userUpgrade.tankLevel; i++)
         {
             tankUpgrades[i - 1].gameObject.SetActive(true);
         }
-
         //Costs
         if (userUpgrade.tankLevel < currLP.vape.tanks.Count)
         {
@@ -368,12 +425,70 @@ public class GamePlay : MonoBehaviour
         if (userData.currentMoney < currLP.vape.tanks[userUpgrade.tankLevel].cost)
         {
             //Cannot affort, change color
-            buttonBuyTanks.image.color = Color.red;
+            buttonBuyTanks.gameObject.SetActive(false);
         }
         else
         {
             //Can afford, turn normal color
-            buttonBuyTanks.image.color = Color.white;
+            buttonBuyTanks.gameObject.SetActive(true);
+        }
+
+        //Coils
+        for (int i = 1; i <= userUpgrade.coilLevel; i++)
+        {
+            coilUpgrades[i - 1].gameObject.SetActive(true);
+        }
+        //Costs
+        if (userUpgrade.coilLevel < currLP.vape.coils.Count)
+        {
+            buttonBuyCoils.gameObject.SetActive(true);
+            //Subtract 1 because of Array
+            textCoilCost.text = "$" + currLP.vape.coils[userUpgrade.coilLevel].cost;
+        }
+        else
+        {
+            //Hide Button
+            buttonBuyCoils.gameObject.SetActive(false);
+        }
+
+        if (userData.currentMoney < currLP.vape.coils[userUpgrade.coilLevel].cost)
+        {
+            //Cannot affort, change color
+            buttonBuyCoils.gameObject.SetActive(false);
+        }
+        else
+        {
+            //Can afford, turn normal color
+            buttonBuyCoils.gameObject.SetActive(true);
+        }
+
+        //Cottons
+        for (int i = 1; i <= userUpgrade.cottonLevel; i++)
+        {
+            cottonUpgrades[i - 1].gameObject.SetActive(true);
+        }
+        //Costs
+        if (userUpgrade.cottonLevel < currLP.vape.cottons.Count)
+        {
+            buttonBuyCottons.gameObject.SetActive(true);
+            //Subtract 1 because of Array
+            textCottonCost.text = "$" + currLP.vape.cottons[userUpgrade.cottonLevel].cost;
+        }
+        else
+        {
+            //Hide Button
+            buttonBuyCottons.gameObject.SetActive(false);
+        }
+
+        if (userData.currentMoney < currLP.vape.cottons[userUpgrade.cottonLevel].cost)
+        {
+            //Cannot affort, change color
+            buttonBuyCottons.gameObject.SetActive(false);
+        }
+        else
+        {
+            //Can afford, turn normal color
+            buttonBuyCottons.gameObject.SetActive(true);
         }
     }
 
@@ -392,6 +507,45 @@ public class GamePlay : MonoBehaviour
 
             //Update Tank            
             TankBar.maxValue = currLP.vape.tanks.Find(y => y.level == userUpgrade.tankLevel).time;
+
+        }
+    }
+
+    public void BuyCoil()
+    {
+        if (userData.currentMoney >= currLP.vape.coils[userUpgrade.coilLevel].cost)
+        {
+            //Purchase
+            userData.currentMoney -= currLP.vape.coils[userUpgrade.coilLevel].cost;
+            userUpgrade.coilLevel += 1;
+
+            //Update Score         
+            UpdateScore();
+
+            LoadUpgrades();
+
+            //Update Coil          
+            maxCoilTime = currLP.vape.coils.Find(y => y.level == userUpgrade.coilLevel).Overheat;
+            currCoilTime = maxCoilTime;
+
+        }
+    }
+
+    public void BuyCotton()
+    {
+        if (userData.currentMoney >= currLP.vape.cottons[userUpgrade.cottonLevel].cost)
+        {
+            //Purchase
+            userData.currentMoney -= currLP.vape.cottons[userUpgrade.cottonLevel].cost;
+            userUpgrade.cottonLevel += 1;
+
+            //Update Score         
+            UpdateScore();
+
+            LoadUpgrades();
+
+            //Update Cooldown
+            cooldownAmount = currLP.vape.cottons.Find(y => y.level == userUpgrade.cottonLevel).Overheat;
 
         }
     }
@@ -428,24 +582,32 @@ public class GamePlay : MonoBehaviour
         userData.lastPlay = DateTime.Now;
         userData.startPlay = DateTime.Now;
         userData.level = 1;
+        userData.levelPack = 1;
+        userData.selectedVape = 1;
 
         userData.userUpgrades = new List<UserUpgrades>();
 
         UserUpgrades upgrade = new UserUpgrades();
-        upgrade.levelPack = 1;
-        upgrade.level = 1;
+        upgrade.vapeID = 1;
         upgrade.tankLevel = 1;
         upgrade.coilLevel = 1;
         upgrade.cottonLevel = 1;
 
         userData.userUpgrades.Add(upgrade);
 
+        //Add First Vape
+        //userData.UserVapes = new List<Vape>();
+
         SaveUserData();
-
-        UpdateScore();
-
+        
     }
 
+    public void ButtonNewUser()
+    {
+        NewUser();
+
+        LoadLevel();
+    }
 
 
     //Close and Save Application

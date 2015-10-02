@@ -18,6 +18,47 @@
         <Cost>100</Cost>
         <Overheat>10000</Overheat>
       </Coil>
+      <Coil>
+        <Level>3</Level>
+        <Cost>300</Cost>
+        <Overheat>15000</Overheat>
+      </Coil>
+      <Coil>
+        <Level>4</Level>
+        <Cost>800</Cost>
+        <Overheat>20000</Overheat>
+      </Coil>
+      <Coil>
+        <Level>5</Level>
+        <Cost>1500</Cost>
+        <Overheat>25000</Overheat>
+      </Coil>
+
+      <Cotton>
+        <Level>1</Level>
+        <Cost>0</Cost>
+        <Overheat>500</Overheat>
+      </Cotton>
+      <Cotton>
+        <Level>2</Level>
+        <Cost>100</Cost>
+        <Overheat>1000</Overheat>
+      </Cotton>
+      <Cotton>
+        <Level>3</Level>
+        <Cost>300</Cost>
+        <Overheat>1500</Overheat>
+      </Cotton>
+      <Cotton>
+        <Level>4</Level>
+        <Cost>800</Cost>
+        <Overheat>2000</Overheat>
+      </Cotton>
+      <Cotton>
+        <Level>5</Level>
+        <Cost>1500</Cost>
+        <Overheat>2500</Overheat>
+      </Cotton>
 
       <Tank>
         <Level>1</Level>
@@ -48,9 +89,10 @@
     </Vape>
     
     <Levels>
-      <Name>Level 1-1</Name>
+      <Name>Level 1</Name>
+      <ID>1</ID>
       <PointValue>5</PointValue>
-      <PointsToNextLevel>1000</PointsToNextLevel>
+      <PointsToNextLevel>100</PointsToNextLevel>
       <Multipliers>
         <TimeValue>0</TimeValue>
         <MultiplierValue>0</MultiplierValue>
@@ -65,9 +107,46 @@
       </Multipliers>
     </Levels>
     <Levels>
-      <Name>Level 1-2</Name>
+      <Name>Level 2</Name>
+      <ID>2</ID>
       <PointValue>10</PointValue>
       <PointsToNextLevel>2000</PointsToNextLevel>
+      <Multipliers>
+        <TimeValue>0</TimeValue>
+        <MultiplierValue>0</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>1500</TimeValue>
+        <MultiplierValue>0.75</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>4000</TimeValue>
+        <MultiplierValue>1.25</MultiplierValue>
+      </Multipliers>
+    </Levels>
+    <Levels>
+      <Name>Level 3</Name>
+      <ID>3</ID>
+      <PointValue>15</PointValue>
+      <PointsToNextLevel>5000</PointsToNextLevel>
+      <Multipliers>
+        <TimeValue>0</TimeValue>
+        <MultiplierValue>0</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>1500</TimeValue>
+        <MultiplierValue>0.75</MultiplierValue>
+      </Multipliers>
+      <Multipliers>
+        <TimeValue>4000</TimeValue>
+        <MultiplierValue>1.25</MultiplierValue>
+      </Multipliers>
+    </Levels>
+    <Levels>
+      <Name>Level 4</Name>
+      <ID>4</ID>
+      <PointValue>20</PointValue>
+      <PointsToNextLevel>9000</PointsToNextLevel>
       <Multipliers>
         <TimeValue>0</TimeValue>
         <MultiplierValue>0</MultiplierValue>
